@@ -123,3 +123,6 @@ venv.bak/
 [Bb]in/
 [Bb]uild/
 .hypothesis/
+
+# data
+*.npy
