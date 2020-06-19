@@ -20,11 +20,7 @@ plt.xticks([]), plt.yticks([])
 
 #Different kernels
 for i,k in enumerate(k_sizes):
-<<<<<<< HEAD
   blur = cv2.GaussianBlur(img,ksize=(k,k),sigmaX=0) #cv2 make sigma = 0.3*((ksize-1)*0.5 - 1) + 0.8
-=======
-  blur = cv2.blur(img,(k,k))
->>>>>>> 73ca684fcfac6b170e4aabf922bba5979e02f3bb
   plt.subplot(1, n_kernel+1, 2+i),plt.imshow(blur),plt.title(f'Kernel ({k},{k})', fontsize = 20)
   plt.xticks([]), plt.yticks([])
 plt.tight_layout()

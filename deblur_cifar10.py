@@ -34,8 +34,7 @@ x_train = x_train.astype('float32') / 255.
 x_test  = x_test.astype('float32')  / 255.
 
 dataset = np.concatenate([x_train, x_test], axis=0)
-target  = pr.blur_input(dataset, k_size=10)
-
+target  = pr.blur_input(dataset, k_size=10 )
 
 # MODEL CREATION
 inp   = Input(shape=inputs)
