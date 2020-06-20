@@ -25,8 +25,8 @@ epochs     = 100
 
 size = 10000
 
-save_dir   = os.path.join(os.getcwd(), 'models')
-model_name = save_dir + '/double_conv_8filters.h5'
+model_name = 'doubleConv_mse.h5'
+save_path  = os.path.join(os.getcwd(), 'models', model_name)
 
 # dataset preprocessing TODO : Save the two dataset for faster loading time?
 
@@ -41,14 +41,11 @@ blurred = np.load('data/cifar10_blurred_ksize3.npy')[:size]
 
 x_train, x_test, y_train, y_test = pr.train_test(blurred, dataset)
 
-print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
-
+# TODO : Maybe use different activation Function to help training? (Relu, squashing function ...)
 inp   = Input(shape=(32, 32, 3))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same')(inp)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same', activation='linear')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='linear')(x)
 model = Model(inp, x)
-
-model.summary()
 
 opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                beta_1=0.9,
@@ -60,7 +57,7 @@ metrics = ['mean_absolute_error', 'binary_crossentropy', 'categorical_crossentro
 
 model.compile(optimizer=opt, loss='mean_squared_error', metrics=metrics)
 
-saveback = ModelCheckpoint(filepath=model_name,
+saveback = ModelCheckpoint(filepath=save_path,
                            monitor='val_loss',
                            save_best_only=True,
                            save_weight_only=False,
@@ -81,4 +78,4 @@ history = model.fit(x=x_train, y=y_train,
 names = ['loss', 'val_loss'] + metrics
 df = pd.DataFrame({name : history.history[name] for name in names})
 
-df.to_csv('data/history_single_conv_try.csv', header=True, float_format='%g', index=False)
+df.to_csv('data/hist_doubleConv_mse.csv', header=True, float_format='%g', index=False)

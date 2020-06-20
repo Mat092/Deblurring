@@ -12,12 +12,9 @@ import seaborn as sns
 # TODO : I'm very open about plot style
 sns.set_style('darkgrid')
 
-datafile = 'data/history_single_conv_try'
+datafile = 'data/history_single_conv_try.csv'
 
 data = pd.read_csv(datafile)
-
-data
-
 
 # This line get rid of unnamed: 0, but if in "to_csv" there is index=False, no problem
 if 'Unnamed: 0' in data.columns:
@@ -42,18 +39,33 @@ for i, name in enumerate(['loss', 'val_loss']) :
 
 #%% Some visual evaluation
 
-model = tf.keras.models.load_model('models/single_conv_try.h5')
+model = tf.keras.models.load_model('models/doubleConv_mse.h5')
 
-dataset = np.load('data/cifar10.npy')[:100]
-blurred = np.load('data/cifar10_blurred_ksize3.npy')[:100]
+img_num  = 1000 # which image do u want?
 
-pred = model.predict(blurred)
+# reshape because predict and evaluate want 4 dim
+orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)
+blur = np.load('data/cifar10_blurred_ksize3.npy')[img_num].reshape(1, 32, 32, 3)
 
-plt.imshow(dataset[0])
+metr = model.evaluate(x=blur, y=orig)
+pred = model.predict(blur)[0]
 
-plt.imshow(blurred[0])
+# Show the Incredible result SIDE BY SIDE
+fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
 
-np.max(blurred[0] - pred[0])
+ax1.imshow(orig[0])
+ax1.set_xticks([])
+ax1.set_yticks([])
+ax1.set_title('Original Image')
 
+ax2.imshow(blur[0])
+ax2.set_xticks([])
+ax2.set_yticks([])
+ax2.set_title('Blurred Image')
 
-plt.imshow(pred[0])
+ax3.imshow(pred)
+ax3.set_xticks([])
+ax3.set_yticks([])
+ax3.set_title('Predicted Image')
+
+plt.show();
