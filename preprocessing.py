@@ -14,7 +14,7 @@ import cv2
 def blur_input(dataset, k_size=3, sigma=None):
 
   # kernel size should be odd for cv2.
-  k = k_size if k_size % 2 else k_size-1
+  k = k_size if k_size % 2 else k_size-1  
 
   # TODO : Should do a better control on how sigma values are passed
   if sigma is None:

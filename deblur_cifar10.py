@@ -26,7 +26,7 @@ epochs     = 100
 size = 10000
 
 save_dir   = os.path.join(os.getcwd(), 'models')
-model_name = save_dir + '/single_conv_try.h5'
+model_name = save_dir + '/double_conv_8filters.h5'
 
 # dataset preprocessing TODO : Save the two dataset for faster loading time?
 
@@ -44,7 +44,8 @@ x_train, x_test, y_train, y_test = pr.train_test(blurred, dataset)
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 inp   = Input(shape=(32, 32, 3))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same')(x)
 model = Model(inp, x)
 
 model.summary()
