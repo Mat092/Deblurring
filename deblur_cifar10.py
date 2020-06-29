@@ -3,10 +3,10 @@ First example of deblurring using simple models.
 '''
 
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
 from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dropout, Activation, Flatten, Input
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from metrics import SSIM, PSNR
 import preprocessing as pr
 from callbacks import CustomCB
 
@@ -23,7 +24,7 @@ from callbacks import CustomCB
 batch_size = 100
 epochs     = 100
 
-size = 10000
+size = 30000
 
 model_name = 'doubleConv_mse.h5'
 save_path  = os.path.join(os.getcwd(), 'models', model_name)
@@ -41,6 +42,8 @@ blurred = np.load('data/cifar10_blurred_ksize3.npy')[:size]
 
 x_train, x_test, y_train, y_test = pr.train_test(blurred, dataset)
 
+print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
+
 # TODO : Maybe use different activation Function to help training? (Relu, squashing function ...)
 inp   = Input(shape=(32, 32, 3))
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same', activation='linear')(inp)
@@ -53,9 +56,11 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                epsilon=1e-7
                                )
 
-metrics = ['mean_absolute_error', 'binary_crossentropy', 'categorical_crossentropy']
+metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM]
 
-model.compile(optimizer=opt, loss='mean_squared_error', metrics=metrics)
+model.compile(optimizer=opt, loss='mean_squared_error', loss_weights=[1,], metrics=metrics)
+
+model.summary()
 
 saveback = ModelCheckpoint(filepath=save_path,
                            monitor='val_loss',
@@ -75,7 +80,6 @@ history = model.fit(x=x_train, y=y_train,
                     callbacks=[saveback], # customback], TODO : custom callback
                     )
 
-names = ['loss', 'val_loss'] + metrics
-df = pd.DataFrame({name : history.history[name] for name in names})
+df = pd.DataFrame({name : history.history[name] for name in history.history})
 
-df.to_csv('data/hist_doubleConv_mse.csv', header=True, float_format='%g', index=False)
+df.to_csv('data/hist_{}.csv'.format(model_name), header=True, float_format='%g', index=False)

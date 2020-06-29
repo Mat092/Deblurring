@@ -58,10 +58,10 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                epsilon=1e-7
                                )
 
-metrics = ['mean_absolute_error', 'binary_crossentropy', 'categorical_crossentropy']
+metrics = ['mean_squared_error', 'mean_absolute_error', 'binary_crossentropy', 'categorical_crossentropy']
 
 
-model.compile(optimizer=opt, loss=PSNR, metrics=metrics)
+model.compile(optimizer=opt, loss=PSNR, loss_weights=[-1,], metrics=metrics)
 
 saveback = ModelCheckpoint(filepath=model_fname,
                            monitor='val_loss',

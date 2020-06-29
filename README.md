@@ -1,3 +1,3 @@
-Deblurring
+###Deblurring
 
-Repository for the project number 1 for the Deep Learning exam
+Repository for the project number 1 - Deep Learning Deblurring

@@ -9,10 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from metrics import PSNR, SSIM
+
 # TODO : I'm very open about plot style
 sns.set_style('darkgrid')
 
-datafile = 'data/history_single_conv_try.csv'
+datafile = 'data/history_double_conv_8filters_PSNR.csv'
 
 data = pd.read_csv(datafile)
 
@@ -39,9 +41,9 @@ for i, name in enumerate(['loss', 'val_loss']) :
 
 #%% Some visual evaluation
 
-model = tf.keras.models.load_model('models/doubleConv_mse.h5')
+model = tf.keras.models.load_model('models/double_conv_8filters_PSNR.h5', custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM})
 
-img_num  = 1000 # which image do u want?
+img_num  = 30126 # which image do u want?
 
 # reshape because predict and evaluate want 4 dim
 orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)

@@ -14,7 +14,7 @@ import cv2
 def blur_input(dataset, k_size=3, sigma=None):
 
   # kernel size should be odd for cv2.
-  k = k_size if k_size % 2 else k_size-1  
+  k = k_size if k_size % 2 else k_size-1
 
   # TODO : Should do a better control on how sigma values are passed
   if sigma is None:
@@ -29,6 +29,9 @@ def blur_input(dataset, k_size=3, sigma=None):
 
 
 def cifar_download_and_scale():
+  '''
+  Download and scale the CIFAR_10 dataset from tensorflow.
+  '''
 
   # Input image dimensions
   img_rows, img_cols, channels = 32, 32, 3
@@ -52,6 +55,9 @@ def cifar_download_and_scale():
 
 
 def train_test(input, target, test_size=0.1):
+  '''
+  Simple wrap of train_test_split from scikit.
+  '''
 
   x_train, x_test, y_train, y_test = tts(input, target,
                                         test_size=test_size,
@@ -66,7 +72,7 @@ def train_test(input, target, test_size=0.1):
 
 if __name__ == '__main__':
 
-  # Small Visual Test for Deblurring a random image
+  # Small Visual Test for blurring a random image
 
   from matplotlib import pyplot as plt
 
