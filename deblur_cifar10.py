@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from metrics import SSIM, PSNR
+from metrics import SSIM, PSNR, SSIM_loss, SSIM_multiscale_loss, MIX
 import preprocessing as pr
 from callbacks import CustomCB
 
@@ -26,8 +26,8 @@ epochs     = 100
 
 size = 30000
 
-model_name = 'doubleConv_mse.h5'
-save_path  = os.path.join(os.getcwd(), 'models', model_name)
+model_name = 'doubleConv_mix'
+save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
 # dataset preprocessing TODO : Save the two dataset for faster loading time?
 
@@ -46,8 +46,8 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 # TODO : Maybe use different activation Function to help training? (Relu, squashing function ...)
 inp   = Input(shape=(32, 32, 3))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same', activation='linear')(inp)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='linear')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=8, padding='same', activation='relu')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='sigmoid')(x)
 model = Model(inp, x)
 
 opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
@@ -56,11 +56,9 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                epsilon=1e-7
                                )
 
-metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM]
+metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM, MIX]
 
-model.compile(optimizer=opt, loss='mean_squared_error', loss_weights=[1,], metrics=metrics)
-
-model.summary()
+model.compile(optimizer=opt, loss=MIX, loss_weights=None, metrics=metrics)
 
 saveback = ModelCheckpoint(filepath=save_path,
                            monitor='val_loss',
@@ -69,7 +67,8 @@ saveback = ModelCheckpoint(filepath=save_path,
                            save_freq='epoch',
                            )
 
-customback = CustomCB()
+datafile   = os.path.join(os.getcwd(), 'data', 'hist_{}.csv'.format(model_name))
+customback = CustomCB(datafile)
 
 history = model.fit(x=x_train, y=y_train,
                     batch_size=batch_size,
@@ -77,9 +76,10 @@ history = model.fit(x=x_train, y=y_train,
                     validation_data=(x_test, y_test),
                     verbose=1,
                     shuffle=True,
-                    callbacks=[saveback], # customback], TODO : custom callback
+                    callbacks=[saveback, customback]
                     )
 
-df = pd.DataFrame({name : history.history[name] for name in history.history})
-
-df.to_csv('data/hist_{}.csv'.format(model_name), header=True, float_format='%g', index=False)
+# Already saved in Custom Callbacks
+# df = pd.DataFrame({name : history.history[name] for name in history.history})
+#
+# df.to_csv(datafile, header=True, float_format='%g', index=False)

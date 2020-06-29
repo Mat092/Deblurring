@@ -2,6 +2,8 @@
 Small script to produce some graph for analysis of obtained data
 '''
 
+import os
+
 import tensorflow as tf
 
 import pandas as pd
@@ -14,7 +16,9 @@ from metrics import PSNR, SSIM
 # TODO : I'm very open about plot style
 sns.set_style('darkgrid')
 
-datafile = 'data/history_double_conv_8filters_PSNR.csv'
+model_name = 'doubleConv_mae'
+
+datafile   = os.path.join(os.getcwd(), 'data', 'hist_' + model_name + '.csv')
 
 data = pd.read_csv(datafile)
 
@@ -40,34 +44,41 @@ for i, name in enumerate(['loss', 'val_loss']) :
   data.plot(ax=ax, label=name, y=name, x='epoch')
 
 #%% Some visual evaluation
+modelfile = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
-model = tf.keras.models.load_model('models/double_conv_8filters_PSNR.h5', custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM})
+model = tf.keras.models.load_model(modelfile, custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM})
 
-img_num  = 30126 # which image do u want?
+img_num  = 5000 # which image do u want?
 
 # reshape because predict and evaluate want 4 dim
 orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)
 blur = np.load('data/cifar10_blurred_ksize3.npy')[img_num].reshape(1, 32, 32, 3)
 
-metr = model.evaluate(x=blur, y=orig)
+loss, mse, mae, psnr, ssim = model.evaluate(x=blur, y=orig)
 pred = model.predict(blur)[0]
 
-# Show the Incredible result SIDE BY SIDE
-fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+# Shows the Incredible result SIDE BY SIDE
+def big_plot():
 
-ax1.imshow(orig[0])
-ax1.set_xticks([])
-ax1.set_yticks([])
-ax1.set_title('Original Image')
+  fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
 
-ax2.imshow(blur[0])
-ax2.set_xticks([])
-ax2.set_yticks([])
-ax2.set_title('Blurred Image')
+  fig.suptitle('Metrics -> loss : {:.5}, mse : {:.5}, mae : {:.5}, PSNR : {:.3}. SSIM : {:.3}'.format(loss, mse, mae, psnr, ssim))
 
-ax3.imshow(pred)
-ax3.set_xticks([])
-ax3.set_yticks([])
-ax3.set_title('Predicted Image')
+  ax1.imshow(orig[0])
+  ax1.set_xticks([])
+  ax1.set_yticks([])
+  ax1.set_title('Original Image')
 
-plt.show();
+  ax2.imshow(blur[0])
+  ax2.set_xticks([])
+  ax2.set_yticks([])
+  ax2.set_title('Blurred Image')
+
+  ax3.imshow(pred)
+  ax3.set_xticks([])
+  ax3.set_yticks([])
+  ax3.set_title('Predicted Image')
+
+  plt.show();
+
+big_plot();

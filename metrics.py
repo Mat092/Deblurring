@@ -43,8 +43,28 @@ def PSNR(y_true, y_pred):
   return tf.image.psnr(y_true, y_pred, max_val=1.)
 
 
-def SSIM(y_true, y_pred):
+def SSIM_loss(y_true, y_pred):
 
+  '''
+  Structural SIMiliraty index defined here :
+
+  https://en.wikipedia.org/wiki/Structural_similarity
+
+  The lower, the better. range [0, 1]
+  '''
+  return 1 - tf.image.ssim(y_true, y_pred, max_val=1., filter_size=11, filter_sigma=1.5, k1=0.01, k2=0.03)
+
+
+def SSIM_multiscale_loss(y_true, y_pred):
+  '''
+  Multiscale SSIM Reference in :
+
+  arxiv 1511.08861v3 - "Loss Function for Image Restoration with Neural Networks, H. Zhao et al."
+  '''
+  return 1 - tf.image.ssim_multiscale(y_true, y_pred, max_val=1., filter_size=11, filter_sigma=1.5, k1=0.01, k2=0.03)
+
+
+def SSIM(y_true, y_pred):
   '''
   Structural SIMiliraty index defined here :
 
@@ -61,7 +81,22 @@ def SSIM_multiscale(y_true, y_pred):
 
   arxiv 1511.08861v3 - "Loss Function for Image Restoration with Neural Networks, H. Zhao et al."
   '''
-  return tf.image.ssim_multiscale( y_true, y_pred, max_val=1., filter_size=11, filter_sigma=1.5, k1=0.01, k2=0.03)
+  return tf.image.ssim_multiscale( y_true, y_pred, max_val=1., filter_size=5, filter_sigma=1.5, k1=0.01, k2=0.03)
+
+
+def MIX(y_true, y_pred):
+  '''
+  linear combination of multiscale sim and l1, defined :
+
+  arxiv 1511.08861v3 - "Loss Function for Image Restoration with Neural Networks, H. Zhao et al."
+  '''
+
+  alpha = 0.84
+
+  # TODO: Missing a term I don't fully understand
+  return alpha * SSIM_loss(y_true, y_pred) + (1. - alpha) * tf.keras.backend.mean(tf.keras.backend.abs(y_true - y_pred), axis=[1, 2, 3])
+
+  # tf.keras.losses.MAE(y_true, y_pred)
 
 
 if __name__ == '__main__':
