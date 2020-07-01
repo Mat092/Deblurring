@@ -24,9 +24,9 @@ from callbacks import CustomCB
 batch_size = 64
 epochs     = 100
 
-size = 10000
+size = 30000
 
-model_name = 'conv5_ssim_psnr_32filters'
+model_name = 'conv2_mse_32filters_sgd'
 save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
 # dataset preprocessing TODO : Save the two dataset for faster loading time?
@@ -46,9 +46,6 @@ print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 inp   = Input(shape=(32, 32, 3))
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(inp)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3 , padding='same', activation='sigmoid')(x)
 model = Model(inp, x)
 
@@ -60,9 +57,11 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                epsilon=1e-7
                                )
 
+opt = tf.keras.optimizers.SGD(learning_rate=1., momentum=.9, nesterov=True) # keras standard params
+
 metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM, MIX]
 
-model.compile(optimizer=opt, loss=SSIM_PSNR, loss_weights=None, metrics=metrics)
+model.compile(optimizer=opt, loss='mean_squared_error', loss_weights=None, metrics=metrics)
 
 saveback = ModelCheckpoint(filepath=save_path,
                            monitor='val_loss',
