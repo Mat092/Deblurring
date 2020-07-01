@@ -11,22 +11,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from metrics import PSNR, SSIM
+from metrics import PSNR, SSIM, MIX
 
 # TODO : I'm very open about plot style
 sns.set_style('darkgrid')
 
-model_name = 'doubleConv_mae'
+model_name = 'doubleConv_mse'
 
 datafile   = os.path.join(os.getcwd(), 'data', 'hist_' + model_name + '.csv')
 
 data = pd.read_csv(datafile)
 
-# This line get rid of unnamed: 0, but if in "to_csv" there is index=False, no problem
-if 'Unnamed: 0' in data.columns:
-  data = data.drop('Unnamed: 0', axis=1)
-
-data
+data.
 
 # add column 'epoch' to dataframe
 num_rows = data.index[-1] + 1
@@ -46,14 +42,15 @@ for i, name in enumerate(['loss', 'val_loss']) :
 #%% Some visual evaluation
 modelfile = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
-model = tf.keras.models.load_model(modelfile, custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM})
+model = tf.keras.models.load_model(modelfile, custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX})
 
-img_num  = 5000 # which image do u want?
+img_num  = 3200 # which image do u want?
 
 # reshape because predict and evaluate want 4 dim
 orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)
 blur = np.load('data/cifar10_blurred_ksize3.npy')[img_num].reshape(1, 32, 32, 3)
 
+# loss, mse, mae, psnr, ssim, mix = model.evaluate(x=blur, y=orig)
 loss, mse, mae, psnr, ssim = model.evaluate(x=blur, y=orig)
 pred = model.predict(blur)[0]
 
@@ -62,7 +59,7 @@ def big_plot():
 
   fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
 
-  fig.suptitle('Metrics -> loss : {:.5}, mse : {:.5}, mae : {:.5}, PSNR : {:.3}. SSIM : {:.3}'.format(loss, mse, mae, psnr, ssim))
+  fig.suptitle('Metrics -> loss : {:.5}, mse : {:.5}, mae : {:.5}, PSNR : {:.3}. SSIM : {:.3}, MIX : {:.3}'.format(loss, mse, mae, psnr, ssim, mix))
 
   ax1.imshow(orig[0])
   ax1.set_xticks([])

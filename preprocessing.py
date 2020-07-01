@@ -9,23 +9,25 @@ from tensorflow.keras.datasets import cifar10
 from sklearn.model_selection import train_test_split as tts
 
 import numpy as np
-import cv2
 
-def blur_input(dataset, k_size=3, sigma=None):
-
-  # kernel size should be odd for cv2.
-  k = k_size if k_size % 2 else k_size-1
-
-  # TODO : Should do a better control on how sigma values are passed
-  if sigma is None:
-    sigma = np.random.uniform(low=0., high=3., size=len(dataset))
-
-  # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
-  # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
-  y = [cv2.GaussianBlur(img, ksize=(k,k), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
-       for img, s in zip(dataset, sigma) ]
-
-  return np.asarray(y, dtype='float32')
+# TODO : need to comment that for a second sorry
+# import cv2
+#
+# def blur_input(dataset, k_size=3, sigma=None):
+#
+#   # kernel size should be odd for cv2.
+#   k = k_size if k_size % 2 else k_size-1
+#
+#   # TODO : Should do a better control on how sigma values are passed
+#   if sigma is None:
+#     sigma = np.random.uniform(low=0., high=3., size=len(dataset))
+#
+#   # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
+#   # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
+#   y = [cv2.GaussianBlur(img, ksize=(k,k), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
+#        for img, s in zip(dataset, sigma) ]
+#
+#   return np.asarray(y, dtype='float32')
 
 
 def cifar_download_and_scale():

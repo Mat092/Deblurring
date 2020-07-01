@@ -8,8 +8,6 @@ class CustomCB(Callback):
   This object can be passed to different keras function and can
   store a lot of different informations, usefull for posterior data analysis
 
-  Empty for now though.
-
   List of possibility at :
   https://www.tensorflow.org/guide/keras/custom_callback
   '''
@@ -30,8 +28,6 @@ class CustomCB(Callback):
     '''
     At the end of each epoch save the history data.
     '''
-
-    print('Sono in epoch end, ', logs)
 
     self.data = self.data.append(logs, ignore_index=True)
     self.data.to_csv(self.datafile, header=True, float_format='%g', index=False)

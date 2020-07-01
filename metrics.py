@@ -93,7 +93,7 @@ def MIX(y_true, y_pred):
 
   alpha = 0.84
 
-  # TODO: Missing a term I don't fully understand
+  # TODO: Missing a term I don't fully understand, sssim_multiscale is broken in tensorflow
   return alpha * SSIM_loss(y_true, y_pred) + (1. - alpha) * tf.keras.backend.mean(tf.keras.backend.abs(y_true - y_pred), axis=[1, 2, 3])
 
   # tf.keras.losses.MAE(y_true, y_pred)
