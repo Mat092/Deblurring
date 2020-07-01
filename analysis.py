@@ -11,12 +11,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from metrics import PSNR, SSIM, MIX
+from metrics import PSNR, SSIM, MIX, SSIM_loss, SSIM_PSNR
 
 # TODO : I'm very open about plot style
 sns.set_style('darkgrid')
 
-model_name = 'doubleConv_mse'
+model_name = 'tripleConv_ssim_sigmoid_16filters'
 
 datafile   = os.path.join(os.getcwd(), 'data', 'hist_' + model_name + '.csv')
 
@@ -40,18 +40,22 @@ for i, name in enumerate(['loss', 'val_loss']) :
   data.plot(ax=ax, label=name, y=name, x='epoch')
 
 #%% Some visual evaluation
+
+model_name = 'conv5_ssim_psnr_32filters'
+
 modelfile = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
-model = tf.keras.models.load_model(modelfile, custom_objects={'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX})
+objects = {'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX, 'SSIM_loss' : SSIM_loss, 'SSIM_PSNR' : SSIM_PSNR}
+model   = tf.keras.models.load_model(modelfile, custom_objects=objects)
 
-img_num  = 3200 # which image do u want?
+img_num  = 50000 # which image do u want?
 
 # reshape because predict and evaluate want 4 dim
 orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)
 blur = np.load('data/cifar10_blurred_ksize3.npy')[img_num].reshape(1, 32, 32, 3)
 
 # loss, mse, mae, psnr, ssim, mix = model.evaluate(x=blur, y=orig)
-loss, mse, mae, psnr, ssim = model.evaluate(x=blur, y=orig)
+loss, mse, mae, psnr, ssim, mix = model.evaluate(x=blur, y=orig)
 pred = model.predict(blur)[0]
 
 # Shows the Incredible result SIDE BY SIDE

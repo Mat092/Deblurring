@@ -38,7 +38,8 @@ def PSNR(y_true, y_pred):
 
   https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
 
-  The higher, the better. range [0, inf)
+  The higher, the better. range [0, inf). A 0.25 dB increase is considered to be a significative
+  optimization, seen by Human eye.
   '''
   return tf.image.psnr(y_true, y_pred, max_val=1.)
 
@@ -91,12 +92,18 @@ def MIX(y_true, y_pred):
   arxiv 1511.08861v3 - "Loss Function for Image Restoration with Neural Networks, H. Zhao et al."
   '''
 
-  alpha = 0.84
+  alpha = 0.84 # from the article
 
-  # TODO: Missing a term I don't fully understand, sssim_multiscale is broken in tensorflow
+  # TODO: Missing a term I don't fully understand, ssim_multiscale is broken in tensorflow
   return alpha * SSIM_loss(y_true, y_pred) + (1. - alpha) * tf.keras.backend.mean(tf.keras.backend.abs(y_true - y_pred), axis=[1, 2, 3])
 
   # tf.keras.losses.MAE(y_true, y_pred)
+
+def SSIM_PSNR(y_true, y_pred):
+  '''
+  Combination of PSNR and SSIM. The coefficient are chosen wisely.
+  '''
+  return .9 * SSIM_loss(y_true, y_pred) - .1 * PSNR(y_true, y_pred)
 
 
 if __name__ == '__main__':

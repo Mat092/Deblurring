@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from metrics import SSIM, PSNR, SSIM_loss, SSIM_multiscale_loss, MIX
+from metrics import SSIM, PSNR, SSIM_loss, SSIM_multiscale_loss, MIX, SSIM_PSNR
 import preprocessing as pr
 from callbacks import CustomCB
 
@@ -24,9 +24,9 @@ from callbacks import CustomCB
 batch_size = 64
 epochs     = 100
 
-size = 30000
+size = 10000
 
-model_name = 'tripleConv_mse_sigmoid'
+model_name = 'conv5_ssim_psnr_32filters'
 save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
 # dataset preprocessing TODO : Save the two dataset for faster loading time?
@@ -44,11 +44,12 @@ x_train, x_test, y_train, y_test = pr.train_test(blurred, dataset)
 
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
-# TODO : Maybe use different activation Function to help training? (Relu, squashing function ...)
 inp   = Input(shape=(32, 32, 3))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='linear')(inp)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='linear')(x)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3, padding='same', activation='sigmoid')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3 , padding='same', activation='sigmoid')(x)
 model = Model(inp, x)
 
 model.summary()
@@ -61,7 +62,7 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
 
 metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM, MIX]
 
-model.compile(optimizer=opt, loss='mean_squared_error', loss_weights=None, metrics=metrics)
+model.compile(optimizer=opt, loss=SSIM_PSNR, loss_weights=None, metrics=metrics)
 
 saveback = ModelCheckpoint(filepath=save_path,
                            monitor='val_loss',

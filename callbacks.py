@@ -31,7 +31,7 @@ class CustomCB(Callback):
 
     self.data = self.data.append(logs, ignore_index=True)
     self.data.to_csv(self.datafile, header=True, float_format='%g', index=False)
-    print('Saved History at {}'.format(self.datafile))
+    print('\nSaved History at {}\n'.format(self.datafile))
 
 
 if __name__ == '__main__':

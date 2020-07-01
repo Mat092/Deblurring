@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split as tts
 
 import numpy as np
 
-# TODO : need to comment that for a second sorry
+# TODO : need to comment that for a second sorry (conflict with tensorflow gpu)
 # import cv2
 #
 # def blur_input(dataset, k_size=3, sigma=None):
