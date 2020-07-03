@@ -48,7 +48,7 @@ modelfile = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 objects = {'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX, 'SSIM_loss' : SSIM_loss, 'SSIM_PSNR' : SSIM_PSNR}
 model   = tf.keras.models.load_model(modelfile, custom_objects=objects)
 
-img_num  = 50000 # which image do u want?
+img_num  = 10101 # which image do u want?
 
 # reshape because predict and evaluate want 4 dim
 orig = np.load('data/cifar10.npy')[img_num].reshape(1, 32, 32, 3)

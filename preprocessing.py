@@ -10,24 +10,21 @@ from sklearn.model_selection import train_test_split as tts
 
 import numpy as np
 
-# TODO : need to comment that for a second sorry (conflict with tensorflow gpu)
-# import cv2
-#
-# def blur_input(dataset, k_size=3, sigma=None):
-#
-#   # kernel size should be odd for cv2.
-#   k = k_size if k_size % 2 else k_size-1
-#
-#   # TODO : Should do a better control on how sigma values are passed
-#   if sigma is None:
-#     sigma = np.random.uniform(low=0., high=3., size=len(dataset))
-#
-#   # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
-#   # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
-#   y = [cv2.GaussianBlur(img, ksize=(k,k), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
-#        for img, s in zip(dataset, sigma) ]
-#
-#   return np.asarray(y, dtype='float32')
+# TODO : need to comment that for a second sorry (conflict with tensorflow-gpu in miniconda)
+import cv2
+
+def blur_input(dataset, sigma=None):
+
+  # TODO : Should do a better control on how sigma values are passed
+  if sigma is None:
+    sigma = np.random.uniform(low=0., high=3., size=len(dataset))
+
+  # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
+  # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
+  y = [cv2.GaussianBlur(img, ksize=(0,0), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
+       for img, s in zip(dataset, sigma) ]
+
+  return np.asarray(y, dtype='float32')
 
 
 def cifar_download_and_scale():
@@ -74,22 +71,68 @@ def train_test(input, target, test_size=0.1):
 
 if __name__ == '__main__':
 
-  # Small Visual Test for blurring a random image
+  # Blur and save the dataset.
+  datafile = os.path.join(os.getcwd(), 'data', 'cifar10.npy')
+  outfile  = os.path.join(os.getcwd(), 'data', 'cifar10_blur_sigma0-3.npy')
 
-  from matplotlib import pyplot as plt
+  dataset  = np.load(datafile)
 
-  fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12,5))
+  # Blur and save
+  blurred  = blur_input(dataset)
+  np.save(outfile, blurred)
 
-  img = cv2.imread('images/lenna.png', 4)
-  img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  input = blur_input([img]*10, k_size=20)
+  blurred = np.load(outfile)
 
-  ax1.imshow(img/255)
-  ax1.set_xticks([])
-  ax1.set_yticks([])
+  def show_image():
 
-  ax2.imshow(input[0]/255)
-  ax2.set_xticks([])
-  ax2.set_yticks([])
+    img_num = np.random.randint(low=0, high=len(dataset-1))
 
-  plt.show();
+    orig = dataset[img_num]
+    blur = blurred[img_num]
+
+    # Small Visual Test for blurring
+    from matplotlib import pyplot as plt
+
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12,5))
+
+    ax1.imshow(orig)
+    ax1.set_title('Original Image')
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+
+    ax2.imshow(blur)
+    ax2.set_title('Blurred Image')
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+
+    plt.show();
+
+  show_image()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#%%
