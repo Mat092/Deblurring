@@ -1,12 +1,11 @@
-'''
-First example of deblurring using simple models.
-'''
-
 import os
+import glob
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+import random
+import imageio
+
 import tensorflow as tf
-from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dropout, Activation, Flatten, Input
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
@@ -17,25 +16,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from metrics import SSIM, PSNR, SSIM_loss, SSIM_multiscale_loss, MIX, SSIM_PSNR
-import preprocessing as pr
 from callbacks import CustomCB
+from generator import DataGenerator
+from preprocessing import read_REDS
 
-# Constants
-batch_size = 64
+batch_size = 32
 epochs     = 100
 
-size = 30000
-
-model_name = 'conv2_mse_32filters_sgd'
+model_name = 'conv2_16filt_reds'
 save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
-dataset = np.load('data/cifar10.npy')[:size]
-blurred = np.load('data/cifar10_blurred_ksize3.npy')[:size]
+x_train, x_test, y_train, y_test = read_REDS(test_size=0.1)
 
-x_train, x_test, y_train, y_test = pr.train_test(blurred, dataset)
+train = DataGenerator(x_train, y_train, batch_size=batch_size)
+test  = DataGenerator(x_test,  y_test,  batch_size=batch_size)
 
-inp   = Input(shape=(32, 32, 3))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=32, padding='same', activation='linear')(inp)
+# read a sample patch to retrieve image size
+h, w, c = imageio.imread(x_train[0]).shape
+
+inp   = Input(shape=(h, w, c))
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(inp)
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3 , padding='same', activation='sigmoid')(x)
 model = Model(inp, x)
 
@@ -61,13 +61,16 @@ saveback = ModelCheckpoint(filepath=save_path,
                            )
 
 datafile   = os.path.join(os.getcwd(), 'data', 'hist_{}.csv'.format(model_name))
+
+# custom back saves all the info we need in pandas dataframe.
 customback = CustomCB(datafile)
 
-history = model.fit(x=x_train, y=y_train,
-                    batch_size=batch_size,
+history = model.fit(x=train,
+                    y=None,
                     epochs=epochs,
-                    validation_data=(x_test, y_test),
+                    validation_data=test,
                     verbose=1,
                     shuffle=True,
-                    callbacks=[saveback, customback]
+                    callbacks=[saveback, customback],
+                    use_multiprocessing=True
                     )

@@ -3,30 +3,30 @@ Some function to ease preprocessing operation
 '''
 
 import os
+import random
 
 from tensorflow.keras.datasets import cifar10
 
 from sklearn.model_selection import train_test_split as tts
 
 import numpy as np
-
 from matplotlib import pyplot as plt
 
 # TODO : need to comment that for a second sorry (conflict with tensorflow-gpu in miniconda)
-import cv2
-
-def blur_input(dataset, sigma=None):
-
-  # TODO : Should do a better control on how sigma values are passed
-  if sigma is None:
-    sigma = np.random.uniform(low=0., high=3., size=len(dataset))
-
-  # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
-  # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
-  y = [cv2.GaussianBlur(img, ksize=(0,0), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
-       for img, s in zip(dataset, sigma) ]
-
-  return np.asarray(y, dtype='float32')
+# import cv2
+#
+# def blur_input(dataset, sigma=None):
+#
+#   # TODO : Should do a better control on how sigma values are passed
+#   if sigma is None:
+#     sigma = np.random.uniform(low=0., high=3., size=len(dataset))
+#
+#   # If sigmaY is 0, the value from sigmaX is used. TODO : border Type?
+#   # TODO : It is possible to do this with multiprocessing for speed up, but maybe not necessary.
+#   y = [cv2.GaussianBlur(img, ksize=(0,0), sigmaX=s, sigmaY=0., borderType=cv2.BORDER_DEFAULT)
+#        for img, s in zip(dataset, sigma) ]
+#
+#   return np.asarray(y, dtype='float32')
 
 
 def cifar_download_and_scale():
@@ -85,7 +85,54 @@ def anti_tranform(data):
   return np.fft.ifftn(data, s=None, axes=(1, 2, 3), norm=None)
 
 
+def read_REDS(test_size=0.1):
+
+  sharpdir = os.path.join(os.getcwd(), 'data', 'redREDS', 'sharp')
+  blurdir  = os.path.join(os.getcwd(), 'data', 'redREDS', 'blur')
+
+  # Read all files names from directories
+  sharp_paths = sorted(os.listdir(sharpdir))
+  blur_paths  = sorted(os.listdir(blurdir))
+
+  test_num  = int(len(sharp_paths) * test_size)
+
+  x_train_list = []
+  y_train_list = []
+
+  x_test_list = []
+  y_test_list = []
+
+  # Add absolute path
+  for i, sharp_name in enumerate(sharp_paths):
+
+    blur_name = sharp_name.replace('sharp', 'blur')
+
+    blur_path  = os.path.join(blurdir,  blur_name)
+    sharp_path = os.path.join(sharpdir, sharp_name)
+
+    x_train_list.append(blur_path)
+    y_train_list.append(sharp_path)
+
+  # Create test lists and train list
+  for i in range(test_num):
+
+    # Same names selection (RANDOM)
+    sharp_name = random.choice(y_train_list)
+    blur_name  = sharp_name.replace('sharp', 'blur')
+
+    # Add to test sets
+    x_test_list.append(blur_name)
+    y_test_list.append(sharp_name)
+
+    # Remove from train set
+    x_train_list.remove(blur_name)
+    y_train_list.remove(sharp_name)
+
+  return x_train_list, x_test_list, y_train_list, y_test_list
+
 if __name__ == '__main__':
+
+  # TESTING, DON'T DIVE IN, IT'S TERRIBLE.
 
   # Blur and save the dataset.
   datafile = os.path.join(os.getcwd(), 'data', 'cifar10.npy')
@@ -98,6 +145,19 @@ if __name__ == '__main__':
   # np.save(outfile, blurred)
 
   blurred = np.load(outfile)
+
+  img_num = 184
+
+  plt.imshow(blurred[img_num])
+  plt.imshow(dataset[img_num])
+
+  blur  = blurred[img_num]
+  sharp = dataset[img_num]
+
+  blur  = cv2.cvtColor(blur, cv2.COLOR_BGR2RGB)
+  sharp = cv2.cvtColor(sharp, cv2.COLOR_BGR2RGB)
+  cv2.imwrite('images/car_sharp.png', sharp * 255)
+  cv2.imwrite('images/car_blur.png', blur  * 255)
 
   def show_image(inpt1, inpt2):
 
