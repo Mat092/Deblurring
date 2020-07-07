@@ -23,7 +23,7 @@ from preprocessing import read_REDS
 batch_size = 32
 epochs     = 100
 
-model_name = 'conv2_16filt_reds'
+model_name = 'conv4_16filt_reds_3x3'
 save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
 
 x_train, x_test, y_train, y_test = read_REDS(test_size=0.1)
@@ -34,8 +34,10 @@ test  = DataGenerator(x_test,  y_test,  batch_size=batch_size)
 # read a sample patch to retrieve image size
 h, w, c = imageio.imread(x_train[0]).shape
 
-inp   = Input(shape=(h, w, c))
+inp   = Input(shape=(None, None, c))
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(inp)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(x)
+x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(x)
 x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3 , padding='same', activation='sigmoid')(x)
 model = Model(inp, x)
 
@@ -47,7 +49,7 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                epsilon=1e-7
                                )
 
-opt = tf.keras.optimizers.SGD(learning_rate=1., momentum=.9, nesterov=True) # keras standard params
+# opt = tf.keras.optimizers.SGD(learning_rate=1., momentum=.9, nesterov=True) # keras standard params
 
 metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM, MIX]
 
@@ -72,5 +74,4 @@ history = model.fit(x=train,
                     verbose=1,
                     shuffle=True,
                     callbacks=[saveback, customback],
-                    use_multiprocessing=True
                     )
