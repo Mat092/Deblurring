@@ -21,57 +21,98 @@ from generator import DataGenerator
 from preprocessing import read_REDS
 
 batch_size = 32
-epochs     = 100
+epochs     = 50
 
-model_name = 'conv4_16filt_reds_3x3'
-save_path  = os.path.join(os.getcwd(), 'models', model_name + '.h5')
+cwd = os.getcwd()
 
 x_train, x_test, y_train, y_test = read_REDS(test_size=0.1)
 
 train = DataGenerator(x_train, y_train, batch_size=batch_size)
 test  = DataGenerator(x_test,  y_test,  batch_size=batch_size)
 
-# read a sample patch to retrieve image size
-h, w, c = imageio.imread(x_train[0]).shape
-
-inp   = Input(shape=(None, None, c))
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(inp)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(x)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=16, padding='same', activation='linear')(x)
-x     = Conv2D(kernel_size=(3, 3), strides=(1, 1), filters=3 , padding='same', activation='sigmoid')(x)
-model = Model(inp, x)
-
-model.summary()
-
-opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
-                               beta_1=0.9,
-                               beta_2=0.999,
-                               epsilon=1e-7
-                               )
-
-# opt = tf.keras.optimizers.SGD(learning_rate=1., momentum=.9, nesterov=True) # keras standard params
-
 metrics = ['mean_squared_error', 'mean_absolute_error', PSNR, SSIM, MIX]
 
-model.compile(optimizer=opt, loss='mean_squared_error', loss_weights=None, metrics=metrics)
+h, w, c = imageio.imread(x_train[0]).shape
 
-saveback = ModelCheckpoint(filepath=save_path,
-                           monitor='val_loss',
-                           save_best_only=True,
-                           save_weight_only=False,
-                           save_freq='epoch',
-                           )
+def create_model_conv(conv_num, filters):
 
-datafile   = os.path.join(os.getcwd(), 'data', 'hist_{}.csv'.format(model_name))
+  inp = Input((None, None, None, c))
+  x = Conv2D(kernel_size=(3,3), strides=(1,1), filters=filters, padding='same', activation='linear')(inp)
 
-# custom back saves all the info we need in pandas dataframe.
-customback = CustomCB(datafile)
+  for _ in range(conv_num):
+    x = Conv2D(kernel_size=(3,3), strides=(1,1), filters=filters, padding='same', activation='linear')(x)
 
-history = model.fit(x=train,
-                    y=None,
-                    epochs=epochs,
-                    validation_data=test,
-                    verbose=1,
-                    shuffle=True,
-                    callbacks=[saveback, customback],
-                    )
+  out = Conv2D(kernel_size=(3,3), strides=(1,1), filters=3, padding='same', activation='sigmoid')(x)
+
+  return Model(inp, out)
+
+# objects = {'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX}#, 'SSIM_loss' : SSIM_loss, 'SSIM_PSNR' : SSIM_PSNR}
+# model   = tf.keras.models.load_model(save_path, custom_objects=objects)
+
+def train_model_and_save(model, model_name, loss):
+
+  save_path  = os.path.join(cwd, 'models', model_name)
+
+  opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
+                                 beta_1=0.9,
+                                 beta_2=0.999,
+                                 epsilon=1e-7
+                                 )
+
+  model.compile(optimizer=opt, loss=loss, loss_weights=None, metrics=metrics)
+
+  saveback = ModelCheckpoint(filepath=save_path,
+                             monitor='val_loss',
+                             save_best_only=True,
+                             save_weight_only=False,
+                             save_freq='epoch',
+                             )
+
+  datafile   = os.path.join(os.getcwd(), 'data', 'hist_{}.csv'.format(model_name))
+  customback = CustomCB(datafile)
+
+  model.fit(x=x_train, y=y_train,
+            batch_size=batch_size,
+            epochs=epochs,
+            validation_data=(x_test, y_test),
+            verbose=1,
+            shuffle=True,
+            callbacks=[saveback, customback]
+            )
+
+
+model = creat_model_conv(0, 8)
+model_name = 'conv2_8filt_mse_reds'
+train_model_and_save(model, model_name, 'mean_squared_error')
+
+model = creat_model_conv(0, 8)
+model_name = 'conv2_8filt_mae_reds'
+train_model_and_save(model, model_name, 'mean_absolute_error')
+
+model = creat_model_conv(0, 8)
+model_name = 'conv2_8filt_ssim_reds'
+train_model_and_save(model, model_name, SSIM)
+
+model = creat_model_conv(0, 16)
+model_name = 'conv2_16filt_mse_reds'
+train_model_and_save(model, model_name, 'mean_squared_error')
+
+model = creat_model_conv(0, 16)
+model_name = 'conv2_16filt_mae_reds'
+train_model_and_save(model, model_name, 'mean_absolute_error')
+
+model = creat_model_conv(0, 16)
+model_name = 'conv2_16filt_ssim_reds'
+train_model_and_save(model, model_name, SSIM)
+
+model = creat_model_conv(4, 8)
+model_name = 'conv6_8filt_mse_reds'
+train_model_and_save(model, model_name, 'mean_squared_error')
+
+model = creat_model_conv(4, 8)
+model_name = 'conv6_8filt_mae_reds'
+train_model_and_save(model, model_name, 'mean_absolute_error')
+
+model = creat_model_conv(4, 8)
+model_name = 'conv6_8filt_ssim_reds'
+train_model_and_save(model, model_name, SSIM)
