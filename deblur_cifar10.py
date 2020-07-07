@@ -73,7 +73,7 @@ def create_model_conv(conv_num, filters):
 
 def train_model_and_save(model, model_name, loss):
 
-  save_path  = os.path.join(cwd, 'models', model_name)
+  save_path  = os.path.join(cwd, 'models', model_name + '.h5')
 
   opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                  beta_1=0.9,
@@ -113,7 +113,7 @@ train_model_and_save(model, model_name, 'mean_squared_error')
 
 model_name = 'unetlike_ssim_cifar'
 model = create_model_unetlike()
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv2_16filt_mse_cifar'
 model = create_model_conv(0, 16)
@@ -125,7 +125,7 @@ train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv2_16filt_ssim_cifar'
 model = create_model_conv(0, 16)
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv2_32filt_mse_cifar'
 model = create_model_conv(0, 32)
@@ -137,7 +137,7 @@ train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv2_32filt_ssim_cifar'
 model = create_model_conv(0, 32)
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv6_16filt_mse_cifar'
 model = create_model_conv(4, 16)
@@ -149,4 +149,4 @@ train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv6_16filt_ssim_cifar'
 model = create_model_conv(4, 16)
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)

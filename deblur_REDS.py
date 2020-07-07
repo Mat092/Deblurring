@@ -51,7 +51,7 @@ def create_model_conv(conv_num, filters):
 
 def train_model_and_save(model, model_name, loss):
 
-  save_path  = os.path.join(cwd, 'models', model_name)
+  save_path  = os.path.join(cwd, 'models', model_name + '.h5')
 
   opt = tf.keras.optimizers.Adam(learning_rate=0.001, # keras standard params
                                  beta_1=0.9,
