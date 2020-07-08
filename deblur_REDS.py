@@ -36,7 +36,7 @@ h, w, c = imageio.imread(x_train[0]).shape
 
 def create_model_conv(conv_num, filters):
 
-  inp = Input((None, None, None, c))
+  inp = Input((None, None, c))
   x = Conv2D(kernel_size=(3,3), strides=(1,1), filters=filters, padding='same', activation='linear')(inp)
 
   for _ in range(conv_num):
@@ -71,48 +71,46 @@ def train_model_and_save(model, model_name, loss):
   datafile   = os.path.join(os.getcwd(), 'data', 'hist_{}.csv'.format(model_name))
   customback = CustomCB(datafile)
 
-  model.fit(x=x_train, y=y_train,
-            batch_size=batch_size,
+  model.fit(x=train,
             epochs=epochs,
-            validation_data=(x_test, y_test),
+            validation_data=test,
             verbose=1,
-            shuffle=True,
             callbacks=[saveback, customback]
             )
 
 
-model = creat_model_conv(0, 8)
+model = create_model_conv(0, 8)
 model_name = 'conv2_8filt_mse_reds'
 train_model_and_save(model, model_name, 'mean_squared_error')
 
-model = creat_model_conv(0, 8)
+model = create_model_conv(0, 8)
 model_name = 'conv2_8filt_mae_reds'
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
-model = creat_model_conv(0, 8)
+model = create_model_conv(0, 8)
 model_name = 'conv2_8filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)
 
-model = creat_model_conv(0, 16)
+model = create_model_conv(0, 16)
 model_name = 'conv2_16filt_mse_reds'
 train_model_and_save(model, model_name, 'mean_squared_error')
 
-model = creat_model_conv(0, 16)
+model = create_model_conv(0, 16)
 model_name = 'conv2_16filt_mae_reds'
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
-model = creat_model_conv(0, 16)
+model = create_model_conv(0, 16)
 model_name = 'conv2_16filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)
 
-model = creat_model_conv(4, 8)
+model = create_model_conv(4, 8)
 model_name = 'conv6_8filt_mse_reds'
 train_model_and_save(model, model_name, 'mean_squared_error')
 
-model = creat_model_conv(4, 8)
+model = create_model_conv(4, 8)
 model_name = 'conv6_8filt_mae_reds'
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
-model = creat_model_conv(4, 8)
+model = create_model_conv(4, 8)
 model_name = 'conv6_8filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM)
+train_model_and_save(model, model_name, SSIM_loss)

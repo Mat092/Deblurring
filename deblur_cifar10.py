@@ -58,7 +58,7 @@ def create_model_unetlike():
 
 def create_model_conv(conv_num, filters):
 
-  inp = Input((None, 32, 32, 3))
+  inp = Input((32, 32, 3))
   x = Conv2D(kernel_size=(3,3), strides=(1,1), filters=filters, padding='same', activation='linear')(inp)
 
   for _ in range(conv_num):
@@ -107,13 +107,13 @@ def train_model_and_save(model, model_name, loss):
 # model_name = 'unetlike_mse_cifar'
 # train_model_and_save(model, model_name, 'mean_squared_error')
 
-model_name = 'unetlike_mae_cifar'
-model = create_model_unetlike()
-train_model_and_save(model, model_name, 'mean_squared_error')
-
-model_name = 'unetlike_ssim_cifar'
-model = create_model_unetlike()
-train_model_and_save(model, model_name, SSIM_loss)
+# model_name = 'unetlike_mae_cifar'
+# model = create_model_unetlike()
+# train_model_and_save(model, model_name, 'mean_squared_error')
+#
+# model_name = 'unetlike_ssim_cifar'
+# model = create_model_unetlike()
+# train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv2_16filt_mse_cifar'
 model = create_model_conv(0, 16)
