@@ -32,6 +32,8 @@ columns = data.columns[[1,2,3,4,7,8,9,10]]
 names = ['PSNR', 'SSIM', 'MAE', 'MSE', 'test_PSNR', 'test_SSIM', 'test_MAE', 'test_MSE']
 n_plot = len(columns)//2
 
+n_plot
+
 fig, ax = plt.subplots(ncols=n_plot//2, nrows=n_plot//2, figsize=(5*n_plot, 10))
 # plt.suptitle('Metrics during U-like Net training', fontsize=35)
 for i, name in enumerate(columns) :

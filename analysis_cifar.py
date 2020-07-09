@@ -120,7 +120,6 @@ if __name__ == '__main__':
   psnr_pred_orig[mask].mean()
   ssim_pred_orig[mask].mean()
 
-
   (pred[idx]-blur[idx]).min()
   plt.imshow(pred[7014]-blur[7014]);
 
