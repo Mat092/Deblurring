@@ -79,38 +79,38 @@ def train_model_and_save(model, model_name, loss):
             )
 
 
-model = create_model_conv(0, 8)
-model_name = 'conv2_8filt_mse_reds'
-train_model_and_save(model, model_name, 'mean_squared_error')
+# model = create_model_conv(0, 8)
+# model_name = 'conv2_8filt_mse_reds'
+# train_model_and_save(model, model_name, 'mean_squared_error')
 
-model = create_model_conv(0, 8)
-model_name = 'conv2_8filt_mae_reds'
-train_model_and_save(model, model_name, 'mean_absolute_error')
+# model = create_model_conv(0, 8)
+# model_name = 'conv2_8filt_mae_reds'
+# train_model_and_save(model, model_name, 'mean_absolute_error')
 
-model = create_model_conv(0, 8)
-model_name = 'conv2_8filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM_loss)
-
-model = create_model_conv(0, 16)
-model_name = 'conv2_16filt_mse_reds'
-train_model_and_save(model, model_name, 'mean_squared_error')
-
-model = create_model_conv(0, 16)
-model_name = 'conv2_16filt_mae_reds'
-train_model_and_save(model, model_name, 'mean_absolute_error')
-
-model = create_model_conv(0, 16)
-model_name = 'conv2_16filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM_loss)
+# model = create_model_conv(0, 8)
+# model_name = 'conv2_8filt_ssim_reds'
+# train_model_and_save(model, model_name, SSIM_loss)
+#
+# model = create_model_conv(0, 16)
+# model_name = 'conv2_16filt_mse_reds'
+# train_model_and_save(model, model_name, 'mean_squared_error')
+#
+# model = create_model_conv(0, 16)
+# model_name = 'conv2_16filt_mae_reds'
+# train_model_and_save(model, model_name, 'mean_absolute_error')
+#
+# model = create_model_conv(0, 16)
+# model_name = 'conv2_16filt_ssim_reds'
+# train_model_and_save(model, model_name, SSIM_loss)
 
 model = create_model_conv(4, 8)
 model_name = 'conv6_8filt_mse_reds'
 train_model_and_save(model, model_name, 'mean_squared_error')
 
-model = create_model_conv(4, 8)
-model_name = 'conv6_8filt_mae_reds'
-train_model_and_save(model, model_name, 'mean_absolute_error')
-
-model = create_model_conv(4, 8)
-model_name = 'conv6_8filt_ssim_reds'
-train_model_and_save(model, model_name, SSIM_loss)
+# model = create_model_conv(4, 8)
+# model_name = 'conv6_8filt_mae_reds'
+# train_model_and_save(model, model_name, 'mean_absolute_error')
+#
+# model = create_model_conv(4, 8)
+# model_name = 'conv6_8filt_ssim_reds'
+# train_model_and_save(model, model_name, SSIM_loss)

@@ -102,51 +102,65 @@ def train_model_and_save(model, model_name, loss):
             callbacks=[saveback, customback]
             )
 
+objects = {'PSNR' : PSNR, 'SSIM' : SSIM, 'MIX' : MIX, 'SSIM_loss' : SSIM_loss } # 'SSIM_PSNR' : SSIM_PSNR}
+
 # Already have mse
-# model = create_model_unetlike()
 # model_name = 'unetlike_mse_cifar'
+# model = create_model_unetlike()
+# model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 # train_model_and_save(model, model_name, 'mean_squared_error')
 
 # model_name = 'unetlike_mae_cifar'
+model = create_model_unetlike()
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
+train_model_and_save(model, model_name, 'mean_squared_error')
+
+model_name = 'unetlike_ssim_cifar'
 # model = create_model_unetlike()
-# train_model_and_save(model, model_name, 'mean_squared_error')
-#
-# model_name = 'unetlike_ssim_cifar'
-# model = create_model_unetlike()
-# train_model_and_save(model, model_name, SSIM_loss)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
+train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv2_16filt_mse_cifar'
-model = create_model_conv(0, 16)
+# model = create_model_conv(0, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_squared_error')
 
 model_name = 'conv2_16filt_mae_cifar'
-model = create_model_conv(0, 16)
+# model = create_model_conv(0, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv2_16filt_ssim_cifar'
-model = create_model_conv(0, 16)
+# model = create_model_conv(0, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv2_32filt_mse_cifar'
-model = create_model_conv(0, 32)
+# model = create_model_conv(0, 32)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_squared_error')
 
 model_name = 'conv2_32filt_mae_cifar'
-model = create_model_conv(0, 32)
+# model = create_model_conv(0, 32)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv2_32filt_ssim_cifar'
-model = create_model_conv(0, 32)
+# model = create_model_conv(0, 32)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, SSIM_loss)
 
 model_name = 'conv6_16filt_mse_cifar'
-model = create_model_conv(4, 16)
+# model = create_model_conv(4, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_squared_error')
 
 model_name = 'conv6_16filt_mae_cifar'
-model = create_model_conv(4, 16)
+# model = create_model_conv(4, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, 'mean_absolute_error')
 
 model_name = 'conv6_16filt_ssim_cifar'
-model = create_model_conv(4, 16)
+# model = create_model_conv(4, 16)
+model = tf.keras.models.load_model(os.path.join(cwd, 'models', model_name + '.h5'), custom_objects=objects)
 train_model_and_save(model, model_name, SSIM_loss)
