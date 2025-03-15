@@ -7,8 +7,8 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model, load_model
 
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
 sns.set_style('white')
